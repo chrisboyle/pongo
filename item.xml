@@ -1,0 +1,54 @@
+<html xmlns:py="http://genshi.edgewall.org/" xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">
+<head>
+	<title py:content="item.title">Item Title</title>
+	<style type="text/css">
+		#item { width: 100%; }
+		.title, .author { font-size: 200%; }
+		table { border-collapse: collapse; }
+		th,td { border: 1px solid #000; }
+		th, tr { vertical-align: top; }
+		.title { width: 40%; }
+		.author, .accessLetters { width: 40%; }
+		.type, th { width: 10%; }
+		.triggers ul { margin-bottom: 0; }
+	</style>
+</head>
+<body>
+<?python from genshi import HTML; from genshi.filters import HTMLSanitizer ?>
+
+<table id="item">
+	<tr>
+		<!--td py:content="'%s by %s' % (item.title,item.author) if item.author else item.title" colspan="2" class="titleAndAuthor">Item Title</td-->
+		<td class="title" colspan="2" py:content="item.title">Title</td>
+		<td py:attrs="{'class':'accessLetters' if item.accessibilityCodesYN else 'author'}" py:content="item.accessibilityCodesYN or item.author">Author</td>
+		<td class="available" py:content="HTML(item.availableHTMLFull) | HTMLSanitizer()">Yes/No</td>
+	</tr>
+	<tr>
+		<td py:content="item.type" class="type">Type</td>
+		<td colspan="2" py:content="item.focus" class="focus">Area of focus</td>
+		<td py:content="item.publish" class="published">Published</td>
+	</tr>
+	<tr py:if="item.accessibilityNotes">
+		<th scope="row">Accessibility notes:</th>
+		<td colspan="3" py:content="item.accessibilityNotes">notes here</td>
+	</tr>
+	<tr>
+		<th scope="row">Triggers:</th>
+		<td colspan="3" class="triggers">
+			<ul>
+				<li py:for="t in item.triggersHTML" py:content="HTML(t) | HTMLSanitizer()"></li>
+			</ul>
+		</td>
+	</tr>
+	<tr>
+		<th scope="row">Description:</th>
+		<td colspan="3" py:content="'No description recorded' if not item.description else HTML(item.description) | HTMLSanitizer()">description here</td>
+	</tr>
+
+</table>
+
+<div py:if="item.reviews" py:content="HTML(item.reviews) | HTMLSanitizer()">Reviews go here</div>
+
+</body>
+</html>
+

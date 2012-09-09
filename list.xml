@@ -1,0 +1,52 @@
+<html xmlns:py="http://genshi.edgewall.org/" xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">
+<head>
+	<title>DSC Library</title>
+	<style type="text/css">
+		th { text-align: left; }
+		table { border-collapse: collapse; }
+		th,td { border: 1px solid #000; }
+		.title { max-width: 16em; }
+		.author, .accessibility { max-width: 10em; }
+		.focus { max-width: 12em; }
+		.disabled, .triggers { max-width: 6em; word-wrap: break-word; }
+		.available { max-width: 9em; }
+		.sectionhead { border: none; }
+		.sectionhead h2 { margin-top: 1em; margin-bottom: 0.2em; }
+	</style>
+</head>
+<body>
+<?python from genshi import HTML; from genshi.filters import HTMLSanitizer ?>
+
+<div id="intro" py:content="HTML(texts['Intro']) | HTMLSanitizer()">Intro text here.</div>
+
+<div id="key" py:content="HTML(texts['Key']) | HTMLSanitizer()">Key goes here.</div>
+
+<table id="catalogue">
+	<py:for each="(section,items) in sections" py:with="dvd=section.startswith('DVD'); music=section.startswith('Music')">
+		<th class="sectionhead" scope="col" colspan="7">
+			<h2 py:content="section">Section name</h2>
+		</th>
+		<tr>
+			<th>Title</th>
+			<th py:content="'Accessibility notes' if dvd else 'Artist(s)' if music else 'Author'">Author</th>
+			<th>Disabled?</th>
+			<th>Triggers</th>
+			<th>Available?</th>
+			<th>Area of focus</th>
+			<th>Published</th>
+		</tr>
+		<tr py:for="item in items">
+			<td class="title"><a py:attrs="{'href':item.filename}" py:content="item.title">Item title</a></td>
+			<td py:attrs="{'class': 'accessibility' if dvd else 'author'}" py:content="item.accessibilityCodes if dvd else item.author">Author</td>
+			<td class="disabled"  py:content="item.disabledLetters">X</td>
+			<td class="triggers"  py:content="u' '.join(item.triggerLetters)">X</td>
+			<td class="available" py:content="HTML(item.availableHTML) | HTMLSanitizer()">Yes/No</td>
+			<td class="focus"     py:content="item.focus">Focus</td>
+			<td class="publish"   py:content="item.publish">2012</td>
+		</tr>
+	</py:for>
+</table>
+
+</body>
+</html>
+

@@ -1,0 +1,19 @@
+# Google account credentials
+username: "example@gmail.com"
+password: "password-goes-here"
+
+# Which spreadsheet, which worksheets?
+sheet_name:               "DSC Library catalogue"
+text_worksheet_name:      "Website text"
+catalogue_worksheet_name: "Catalogue"
+
+# The lowercased first word of the first loan column - also used by templates
+array_name:               "loaned"
+
+# Danger! This entire directory will be nuked and recreated every time!
+output_directory: "/home/you/dsc/library-catalogue/output"
+
+trigger_warnings:
+  U: "unknown - there may be other triggers"
+  X: "foo - description of trigger goes here"
+  Zz: "blah - description of another trigger goes here"
