@@ -12,16 +12,27 @@
 		.available { max-width: 9em; }
 		.sectionhead { border: none; }
 		.sectionhead h2 { margin-top: 1em; margin-bottom: 0.2em; }
+		#cover { page-break-after: always; }
+		#covercontent { text-align: center; }
+		@media print {
+			#covercontent { margin: 30% auto 0; }
+			hr { display: none; }
+			@page :first { border: 1px solid black; }
+		}
 	</style>
 </head>
 <body>
 <?python from genshi import HTML; from genshi.filters import HTMLSanitizer ?>
+<div py:if="printing" id="cover">
+	<div id="covercontent" py:content="HTML(texts['Intro']) | HTMLSanitizer()">Cover content here</div>
+	<hr/>
+</div>
 
 <div id="intro" py:content="HTML(texts['Intro']) | HTMLSanitizer()">Intro text here.</div>
 
 <div id="key" py:content="HTML(texts['Key']) | HTMLSanitizer()">Key goes here.</div>
 
-<table id="catalogue">
+<table id="catalogue" py:if="not printing">
 	<py:for each="(section,items) in sections" py:with="dvd=section.startswith('DVD'); music=section.startswith('Music')">
 		<th class="sectionhead" scope="col" colspan="7">
 			<h2 py:content="section">Section name</h2>
@@ -46,6 +57,29 @@
 		</tr>
 	</py:for>
 </table>
+
+<div id="catalogue" py:if="printing">
+<py:for each="(section,items) in sections" py:with="dvd=section.startswith('DVD'); music=section.startswith('Music')">
+	<h2 py:content="section">Section name</h2>
+	<dl>
+		<py:for each="item in items">
+			<dt py:content="('%s: %s' % (item.author, item.title)) if item.author else item.title">
+				A. N. Author: Item Title
+			</dt>
+			<dd>
+				Content warnings:
+				<span py:content="HTML(u'; '.join(item.triggersHTML)) | HTMLSanitizer()">warnings</span>
+				<py:if test="item.accessibilityCodesYN or item.accessibilityNotes">
+					<br/>
+					<span py:content="'%s %s' % (item.accessibilityCodesYN or '', item.accessibilityNotes or '')">
+						accessibility info here
+					</span>
+				</py:if>
+			</dd>
+		</py:for>
+	</dl>
+</py:for>
+</div>
 
 </body>
 </html>

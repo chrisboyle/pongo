@@ -57,8 +57,18 @@ def reverseAvailability(avail, verbose=False):
 def parseTriggers(s):
 	return re.findall(r'\b(U|A|D|SA|Ab|SI|O)\b(?:\s+(?!\b(?:U|A|D|SA|Ab|SI|O)\b)([^;]+);)?', s)
 
+def expandTrigger(entry):
+	letter, detail = entry
+	if letter == 'O':  # other
+		return detail
+	desc = CONFIG['trigger_warnings'][letter]
+	if detail:
+		return u'%s: %s' % (desc, detail)
+	else:
+		return desc
+
 def expandTriggers(triggers):
-	return map(lambda t: t[1] if t[0]==u'O' else u'%s: %s' % (CONFIG['trigger_warnings'][t[0]], t[1]), triggers)
+	return map(expandTrigger, triggers)
 
 def lastID(s):
 	return s.id.text.split('/')[-1]
@@ -181,8 +191,12 @@ try: shutil.rmtree(OUTDIR)
 except OSError,e: pass
 os.makedirs(OUTDIR)
 
+# Write the single-file version
+printHTML = listTemplate.generate(texts=TEXTS, sections=sections, printing=True).render('xhtml')
+with file(os.path.join(OUTDIR, 'print.html'), 'w') as f: f.write(printHTML)
+
 # Write the index page
-listHTML = listTemplate.generate(texts=TEXTS, sections=sections).render('xhtml')
+listHTML = listTemplate.generate(texts=TEXTS, sections=sections, printing=False).render('xhtml')
 with file(os.path.join(OUTDIR, 'index.html'), 'w') as f: f.write(listHTML)
 
 # Write the item pages and title.txt files
